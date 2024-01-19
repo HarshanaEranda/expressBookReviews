@@ -30,18 +30,13 @@ public_users.post("/register", (req, res) => {
   return res.status(404).json({ message: "Unable to register user." });
 });
 
-
-function getAllBooks() {
-  return new Promise((resolve, reject) => {
-    resolve(books);
-  });
-}
-
 // Get the book list available in the shop
 public_users.get('/', async function (req, res) {
   try {
-    const books = await getAllBooks();
-    res.send(JSON.stringify(books));
+    const bookList = await new Promise((resolve, reject) => {
+      resolve(books);
+    });
+    res.send(JSON.stringify(bookList));
   } catch (error) {
     res.status(500).send('Internal Server Error');
   }
@@ -64,8 +59,9 @@ public_users.get('/isbn/:isbn', function (req, res) {
 // Get all books by author name
 public_users.get('/author/:author', function (req, res) {
   let author = req.params.author;
-  getAllBooks()
-    .then((booksdb) => Object.values(booksdb))
+  new Promise((resolve, reject) => {
+    resolve(books);
+  }).then((booksdb) => Object.values(booksdb))
     .then((books) => books.filter((book) => book.author === author))
     .then((Fbooks) => res.send(Fbooks));
 });
@@ -73,8 +69,9 @@ public_users.get('/author/:author', function (req, res) {
 // Get all books by book title
 public_users.get('/title/:title', function (req, res) {
   let title = req.params.title;
-  getAllBooks()
-    .then((booksdb) => Object.values(booksdb))
+  new Promise((resolve, reject) => {
+    resolve(books);
+  }).then((booksdb) => Object.values(booksdb))
     .then((books) => books.filter((book) => book.title === title))
     .then((Fbooks) => res.send(Fbooks));
 });
